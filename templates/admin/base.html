@@ -9,6 +9,9 @@
   {% include 'partials/site_icons.html' %}
   <link rel="stylesheet" href="{{ url_for('static',filename='css/admin.css',v='20261020-dark-contrast-v3') }}">
   <link rel="stylesheet" href="{{ url_for('static',filename='css/staff.css',v='20261018-dark-panel-v2') }}">
+  <meta name="editorial-dropcap-pattern" content="{{ drop_cap_pattern }}">
+  <script nonce="{{ csp_nonce }}" src="{{ url_for('static', filename='js/editorial-markers.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dropcap.css') }}">
   {% block extra_head %}{% endblock %}
 <link rel="stylesheet" href="{{ url_for('static',filename='css/notices.css',v='20261018-dark-panel-v2') }}"><link rel="stylesheet" href="{{ url_for('static', filename='css/footnotes.css', v='20261019-footnotes-v1') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/admin-brand.css',v='20261108') }}"></head>
 <body>

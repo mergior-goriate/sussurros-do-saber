@@ -3,6 +3,7 @@
   const preview = document.querySelector('#markdownPreview');
   if (!editor || !preview) return;
 
+  const dropcap = window.editorialDropcap;
   const escape = (text) => text.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const videoPreview = (title, rawUrl) => {
     try {
@@ -24,7 +25,7 @@
   };
   let estimatedReadingMinutes = 1;
   const updateEditorStatistics = () => {
-    const words = editor.value.replace(/^\[(?:capitular|drop[ -]?cap)\]\s*/gim, '').match(/[\p{L}\p{N}]+(?:[’'-][\p{L}\p{N}]+)*/gu) || [];
+    const words = dropcap.withoutMarkers(editor.value).match(/[\p{L}\p{N}]+(?:[’'-][\p{L}\p{N}]+)*/gu) || [];
     estimatedReadingMinutes = Math.max(1, Math.min(120, Math.ceil(words.length / 200)));
     const count = document.querySelector('#editorWordCount');
     const reading = document.querySelector('#editorReadingTime');
@@ -48,7 +49,7 @@
     return {start, text: end < 0 ? rest : rest.slice(0,end)};
   };
   const updateDropcapState = () => {
-    if (dropcapButton) dropcapButton.setAttribute('aria-pressed', String(/^\[(?:capitular|drop[ -]?cap)\]/i.test(currentParagraph().text)));
+    if (dropcapButton) dropcapButton.setAttribute('aria-pressed', String(Boolean(dropcap.marker(currentParagraph().text))));
   };
   dropcapButton?.addEventListener('click', () => {
     const {start,text} = currentParagraph();
@@ -56,10 +57,10 @@
       dropcapStatus.textContent = 'Coloque o cursor num parágrafo de texto para aplicar a capitular.';
       return;
     }
-    const marker = text.match(/^\[(?:capitular|drop[ -]?cap)\][ \t]*/i)?.[0];
+    const marker = dropcap.marker(text);
     const cursor = editor.selectionStart;
-    editor.setRangeText(marker ? '' : '[capitular] ', start, marker ? start+marker.length : start, 'preserve');
-    const next = Math.max(start,cursor+(marker ? -marker.length : '[capitular] '.length));
+    editor.setRangeText(marker ? '' : dropcap.canonical, start, marker ? start+marker.length : start, 'preserve');
+    const next = Math.max(start,cursor+(marker ? -marker.length : dropcap.canonical.length));
     editor.setSelectionRange(next,next);
     dropcapStatus.textContent = marker ? 'Capitular removida deste parágrafo.' : 'Capitular aplicada a este parágrafo.';
     editor.focus(); render(); updateDropcapState();

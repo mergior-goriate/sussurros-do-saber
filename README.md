@@ -541,7 +541,7 @@ Texto com **ênfase**, [fonte](https://example.org) e uma imagem:
 [capitular] Primeiro parágrafo com capitular.
 ```
 
-Gráficos admitem `bar`, `line` e `pie`, até 12 pontos numéricos finitos não negativos e dados com valor positivo. São gerados como SVG; não consultam dados externos. Vídeos aceitam YouTube (incorporação com domínio de privacidade), Vimeo e ligações directas HTTP/HTTPS MP4, WebM ou OGG reconhecidas. As directivas têm sintaxe própria; testar a apresentação final no artigo e, se aplicável, no PDF. A capitular usa o marcador `[capitular]` no início do parágrafo, também nas traduções: o serviço preserva-o automaticamente. Versões antigas que contêm `[drop cap]`, `[dropcap]` ou `[drop-cap]` são apresentadas com a mesma tipografia, sem alterar o texto guardado.
+Gráficos admitem `bar`, `line` e `pie`, até 12 pontos numéricos finitos não negativos e dados com valor positivo. São gerados como SVG; não consultam dados externos. Vídeos aceitam YouTube (incorporação com domínio de privacidade), Vimeo e ligações directas HTTP/HTTPS MP4, WebM ou OGG reconhecidas. As directivas têm sintaxe própria; testar a apresentação final no artigo e, se aplicável, no PDF. A capitular usa o marcador `[capitular]` no início do parágrafo, também nas traduções: o serviço preserva-o automaticamente. Versões antigas que contêm `[drop cap]`, `[drop_cap]`, `[dropcap]`, `[drop-cap]` ou `[letra capitular]` são apresentadas com a mesma tipografia em todo o portal, sem alterar o texto guardado. A mesma lista de variantes é usada pelo renderizador, pelo tradutor e pelos editores.
 
 ### Uploads do painel
 

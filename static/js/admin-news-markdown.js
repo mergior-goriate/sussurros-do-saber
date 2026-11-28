@@ -67,12 +67,14 @@
     if (kind === 'footnote') return footnote();
     if (kind === 'dropcap') {
       const position = editor.selectionStart;
-      const from = Math.max(0, editor.value.lastIndexOf('\n\n', Math.max(0, position - 1)) + 2);
+      const breakAt = editor.value.lastIndexOf('\n\n', Math.max(0, position - 1));
+      const from = breakAt < 0 ? 0 : breakAt + 2;
       const next = editor.value.indexOf('\n\n', position);
       const to = next < 0 ? editor.value.length : next;
       const paragraph = editor.value.slice(from, to);
       if (!paragraph.trim()) return window.alert('Escreva primeiro o parágrafo.');
-      return insert(/^\[(?:capitular|drop[ -]?cap)\][ \t]*/i.test(paragraph) ? paragraph.replace(/^\[(?:capitular|drop[ -]?cap)\][ \t]*/i, '') : '[capitular] ' + paragraph, from, to);
+      const dropcap = window.editorialDropcap, marker = dropcap.marker(paragraph);
+      return insert(marker ? paragraph.slice(marker.length) : dropcap.canonical + paragraph, from, to);
     }
     if (kind === 'explainer') {
       const title = ask('Título da caixa explicativa (opcional):', '');

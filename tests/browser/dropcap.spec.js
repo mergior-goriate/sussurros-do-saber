@@ -10,7 +10,7 @@ for(const width of [320,1440]){
     await page.goto(path);
     const editor=page.locator('#bodyEditor'), button=page.getByRole('button',{name:'Capitular',exact:true});
     const words=await page.locator('#editorWordCount').textContent();
-    await editor.fill('[drop cap] '+data.body);
+    await editor.fill('[drop_cap] '+data.body);
     await editor.evaluate(el=>{el.focus();el.setSelectionRange(0,0);});
     await expect(button).toHaveAttribute('aria-pressed','true');
     await expect(page.locator('#editorWordCount')).toHaveText(words);
@@ -54,5 +54,26 @@ for(const width of [320,1440]){
     await expect(english.locator('strong')).toHaveText('emphasis');
     expect(await english.evaluate(el=>getComputedStyle(el,'::first-letter').float)).toBe('left');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  });
+}
+
+for (const [name,path,field,button] of [
+  ['news','/admin/noticias/nova','#news-body','[data-news-md="dropcap"]'],
+  ['journal','/admin/revistas/nova','#journal-content-md','[data-md="dropcap"]']
+]) {
+  test(`shared drop cap grammar also works in the ${name} editor`,async({page})=>{
+    const cookie=execFileSync('python',['tests/browser/staff_fixture.py'],{encoding:'utf8'}).trim();
+    await page.context().addCookies([{name:'session',value:cookie,url:'http://127.0.0.1:5000',httpOnly:true,sameSite:'Lax'}]);
+    await page.goto(path);
+    const editor=page.locator(field),toggle=page.locator(button);
+    for(const alias of ['[drop_cap]','[DROP-CAP]','[letra capitular]']){
+      await editor.fill(alias+' A primeira frase.');
+      await editor.evaluate(el=>{el.focus();el.setSelectionRange(0,0);});
+      await toggle.click();
+      await expect(editor).toHaveValue('A primeira frase.');
+      await editor.evaluate(el=>{el.focus();el.setSelectionRange(0,0);});
+      await toggle.click();
+      await expect(editor).toHaveValue('[capitular] A primeira frase.');
+    }
   });
 }

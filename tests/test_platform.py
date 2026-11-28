@@ -533,13 +533,15 @@ class PlatformTests(unittest.TestCase):
         self.assertEqual(rendered.count('class="article-dropcap"'), 1)
 
     def test_english_dropcap_aliases_render_only_at_paragraph_start(self):
-        for marker in ('[drop cap]', '[dropcap]', '[drop-cap]', '[DROP CAP]'):
+        for marker in ('[drop cap]', '[dropcap]', '[drop-cap]', '[drop_cap]', '[DROP_CAP]',
+                       '[ drop  cap ]', '[letra capitular]', '[letra_capitular]', '[DROP CAP]'):
             rendered = str(render_markdown(
                 f'{marker} An **opening** paragraph.\n\nA literal {marker} mention.\n\n`{marker}`'))
             self.assertIn('<p class="article-dropcap">An <strong>opening</strong> paragraph.</p>', rendered)
             self.assertIn(f'A literal {marker} mention.', rendered)
             self.assertIn(f'<code>{marker}</code>', rendered)
             self.assertEqual(rendered.count('class="article-dropcap"'), 1)
+        self.assertIn('[other_marker] Opening', str(render_markdown('[other_marker] Opening')))
         self.assertIn('<a href="https://example.org">drop cap</a>',
                       str(render_markdown('[drop cap](https://example.org)')))
         code = str(render_markdown('```\n[drop cap] Literal code\n```'))
@@ -586,6 +588,22 @@ class PlatformTests(unittest.TestCase):
         self.assertIn('<code>https://example.org/code</code>', rendered)
         self.assertIn('href="https://example.org/?a=1&amp;b=2"', rendered)
         self.assertNotIn("&amp;amp;", rendered)
+
+    def test_dropcap_typography_is_shared_by_public_pages_and_journals(self):
+        from bs4 import BeautifulSoup
+        with app.app_context():
+            journal = Journal(title='Revista de ensaio de capitular', slug='journal-dropcap-regression',
+                              field='Biologia', description='Conteúdo de ensaio.', published=True,
+                              content_markdown='[drop_cap] Texto inicial.\n\nSegundo parágrafo.')
+            db.session.add(journal)
+            db.session.commit()
+        for path in ('/', '/en/', '/noticias', '/en/news', '/revistas/journal-dropcap-regression', '/premium/'):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            doc = BeautifulSoup(response.text, 'html.parser')
+            self.assertIsNotNone(doc.select_one('link[href*="css/dropcap.css"]'), path)
+            if 'journal-dropcap' in path:
+                self.assertEqual(doc.select_one('.article-dropcap').get_text(), 'Texto inicial.')
 
     def test_journal_title_is_rendered_without_removing_introduction(self):
         with app.app_context():

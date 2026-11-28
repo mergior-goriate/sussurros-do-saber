@@ -20,7 +20,7 @@ with app.app_context():
     db.session.add_all([draft,public]);db.session.commit()
     original=source('article',public.id)
     english=dict(original,title='Drop-cap rendering fixture',summary='A synthetic typography fixture.',
-                 body='[drop cap] An opening paragraph with **emphasis**.\n\nA second paragraph.')
+                 body='[drop_cap] An opening paragraph with **emphasis**.\n\nA second paragraph.')
     translation=ContentTranslation(kind='article',source_id=public.id)
     db.session.add(translation);db.session.flush()
     add_version(translation,original,english,dict(ready=True,faithful=True,issues=[]))

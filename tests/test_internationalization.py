@@ -295,7 +295,12 @@ class InternationalizationTests(unittest.TestCase):
             translated, report = service.translate(source)
         self.assertTrue(report['ready'])
         self.assertTrue(translated['body'].startswith('[capitular] Opening'))
-        service.validate(source, {'body': '[drop cap] Opening paragraph.\n\nSecond paragraph.'})
+        for alias in ('[drop cap]', '[drop_cap]', '[DROP_CAP]', '[letra_capitular]'):
+            value = f'{alias} Opening paragraph.\n\nSecond paragraph.'
+            service.validate(source, {'body': value})
+            masked, tokens = service.protect(value)
+            self.assertNotIn(alias, masked)
+            self.assertEqual(service.restore(masked, tokens), value)
         for invalid in ('Opening paragraph.', 'Opening paragraph. [capitular]', '[capitular] Opening.\n\n[capitular] Second.'):
             with self.assertRaises(service.ProtectedContentError):
                 service.validate(source, {'body': invalid})
@@ -306,7 +311,7 @@ class InternationalizationTests(unittest.TestCase):
         db.session.commit()
         item = self.make(publish=True)
         row = service.version(item)
-        row.content = dict(row.content, body='[drop cap] Plants use light.\n\nSecond paragraph.')
+        row.content = dict(row.content, body='[drop_cap] Plants use light.\n\nSecond paragraph.')
         db.session.commit()
         for prefix, text in [('', 'As plantas utilizam luz.'), ('/en', 'Plants use light.')]:
             response = self.client.get(prefix + '/artigo/' + self.article.slug)
@@ -316,7 +321,7 @@ class InternationalizationTests(unittest.TestCase):
             self.assertIsNotNone(paragraph)
             self.assertEqual(paragraph.get_text(), text)
             self.assertEqual(len(doc.select('.article-markdown p.article-dropcap')), 1)
-        self.assertTrue(service.version(item).content['body'].startswith('[drop cap]'))
+        self.assertTrue(service.version(item).content['body'].startswith('[drop_cap]'))
 
     def test_batch_is_async_prioritized_and_can_pause_cancel_pending(self):
         with patch('translation_service.translate') as translator:

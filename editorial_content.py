@@ -5,8 +5,10 @@ from bs4 import BeautifulSoup
 from markupsafe import Markup
 
 
-# Legacy English translations may contain translated spellings of this marker.
-DROP_CAP_MARKER = r"(?i:\[(?:capitular|drop[ -]?cap)\])"
+# The same allowlisted grammar is used by the public renderer, translation
+# protection and every administrative editor. Do not remove arbitrary brackets.
+DROP_CAP_PATTERN = r"\[[ \t]*(?:capitular|letra[ \t_-]+capitular|drop[ \t_-]*cap)[ \t]*\]"
+DROP_CAP_MARKER = r"(?i:" + DROP_CAP_PATTERN + ")"
 
 
 def prepare_guidelines(html):

@@ -72,6 +72,18 @@ class ScienceNewsTests(unittest.TestCase):
         return [card.select_one('h2, h3').get_text(strip=True)
                 for card in soup.select(container + ' .news-card')]
 
+    def test_dropcap_alias_is_rendered_in_news_in_both_languages(self):
+        story, pt = self.story('Notícia de ensaio da capitular')
+        _, en = self.story('Drop cap news fixture', locale='en', story=story)
+        pt.body = '[capitular] Parágrafo inicial.'
+        en.body = '[drop_cap] Opening paragraph.'
+        db.session.commit()
+        for prefix, item, expected in [('/noticias/', pt, 'Parágrafo inicial.'), ('/en/news/', en, 'Opening paragraph.')]:
+            doc = self.soup(prefix + item.slug)
+            self.assertEqual(doc.select_one('.news-body .article-dropcap').get_text(), expected)
+            self.assertIsNotNone(doc.select_one('link[href*="css/dropcap.css"]'))
+            self.assertNotIn('[drop_cap]', doc.select_one('.news-body').get_text())
+
     def test_feature_home_visibility_order_and_theme_navigation(self):
         self.assertIsNone(self.soup('/').select_one('#home-news-title'))
         self.story('Notícia escolhida', offset=-4, featured=True, with_image=True)

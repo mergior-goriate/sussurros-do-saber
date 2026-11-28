@@ -33,13 +33,14 @@ from journal_metadata import journal_authors
 from scientific_search import metadata_match, doi_url
 from clarity_tracking import project_id as clarity_project_id
 from smart_search import article_search
-from editorial_content import DROP_CAP_MARKER, prepare_guidelines
+from editorial_content import DROP_CAP_MARKER, DROP_CAP_PATTERN, prepare_guidelines
 from admin import admin_bp, login_required, slugify, validate_csrf
 from extensions import limiter
 from request_values import DatabaseIdConverter, pagination_page
 from models import AdminUser, Article, Author, Category, Comment, ContactMessage, Journal, Subscriber, EditorialPolicy, db, utcnow
 
 app = Flask(__name__)
+app.jinja_env.globals["drop_cap_pattern"] = DROP_CAP_PATTERN
 app.jinja_env.filters['doi_url'] = doi_url
 app.url_map.converters['int'] = DatabaseIdConverter
 def trusted_proxy_hops(name, default):
@@ -484,7 +485,7 @@ def render_markdown(value, *, article=False, heading_prefix="sec"):
         strip=True,
     )
     cleaned = decorate_notes(cleaned, note_info)
-    cleaned = re.sub(r"<p>" + DROP_CAP_MARKER + r"\s*", '<p class="article-dropcap">', cleaned)
+    cleaned = re.sub(r"<p>" + DROP_CAP_MARKER + r"(?=\s|<)\s*", '<p class="article-dropcap">', cleaned)
     for token, embed in embeds.items():
         cleaned = cleaned.replace(f"<p>{token}</p>", embed).replace(token, embed)
     if article:

@@ -1,9 +1,3 @@
-/* A real text initial: copying and assistive technology retain the whole word. */
-.article-dropcap{display:flow-root}
-.article-dropcap::first-letter{float:left;font-family:Georgia,'Times New Roman',serif;font-size:3.6em;font-weight:700;line-height:.82;margin:.08em .14em 0 0;color:inherit}
-@media(max-width:600px){.article-dropcap::first-letter{font-size:3.2em;margin-top:.1em}}
-@media print{.article-dropcap::first-letter{color:inherit}}
-
 /* Editorial explanations share the public and authenticated preview styling. */
 .article-markdown{display:flow-root}
 .article-explainer{box-sizing:border-box;background:var(--explainer-bg,#ffead0);color:var(--explainer-fg,#302217);border-radius:18px;padding:1.5rem;margin:1.5rem 0;overflow-wrap:anywhere;font-size:.95em;line-height:1.65}
